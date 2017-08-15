@@ -46,6 +46,11 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 
 	if VoicePanels[Ply] then return false end
 
+	if not IsValid(Ply) then
+		VoicePanels[Ply]:Remove()
+		VoicePanels[Ply] = nil
+	end
+
 	local Panel = vgui.Create("DPanel", Frame)
 	Panel:Dock(BOTTOM)
 	Panel:SetHeight(ScrH()/20)
@@ -54,7 +59,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 	Panel.Paint = function( self, w, h )
 		local Alpha = 255
 
-		if ShouldFade[Ply] and not (Ply:VoiceVolume() > 0.01) then --Panel sometimes shows colour behind partially faded avatar
+		if ShouldFade[Ply] and not (Ply:VoiceVolume() > 1) then --Panel sometimes shows colour behind partially faded avatar
 			Alpha = 255 - ((CurTime() - FadeTimestamp[Ply])*FadeRate)
 		end
 
@@ -62,7 +67,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 		draw.RoundedBox( 0, 0, 0, w, h, ColorVol(Ply) )
 		Panel:SetAlpha(Alpha)
 
-		if Alpha < 0 then
+		if Alpha < 0 or not IsValid(Ply) then
 			VoicePanels[Ply]:Remove()
 			VoicePanels[Ply] = nil
 		end
