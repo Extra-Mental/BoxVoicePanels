@@ -24,7 +24,7 @@ local function ColorVol(Ply)
 	local G = TeamCol.g*Vol
 	local B = TeamCol.b*Vol
 
-	return Color(R,G,B,255)
+	return Color(R,G,B,240)
 
 end
 
@@ -59,8 +59,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 	Panel.Paint = function( self, w, h )
 
 		if not IsValid(Ply) then
-			VoicePanels[Ply]:Remove()
-			VoicePanels[Ply] = nil
+			self:Remove()
 		end
 
 		local Alpha = 255
