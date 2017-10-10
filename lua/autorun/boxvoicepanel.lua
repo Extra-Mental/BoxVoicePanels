@@ -16,6 +16,9 @@ local ShouldFade = {}
 local FadeTimestamp = {}
 
 local function ColorVol(Ply)
+
+	if not Ply:IsValid() then return Color(0,0,0,240) end
+
 	local TeamCol = team.GetColor(Ply:Team())
 
 	local Vol = Ply:VoiceVolume()*10 -- 0 black, 1 full team colour
@@ -60,6 +63,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 
 		if not IsValid(Ply) then
 			self:Remove()
+			return
 		end
 
 		local Alpha = 255
