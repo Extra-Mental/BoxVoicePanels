@@ -4,7 +4,11 @@ if SERVER then return end
 
 print("Box Voice Panels Loaded")
 
-local FadeRate = 100
+local Enabled = CreateClientConVar("cleanvoice_enable", 1, true, false, "Enables or disables clean voice panels")
+local FadeRate = CreateClientConVar("cleanvoice_faderate", 100, true, false, "The speed at which the panels fade")
+local RightMargin = CreateClientConVar("cleanvoice_margin_right", 0, true, false, "How much space between the right side of the panels and the screen")
+local BoxMargins = CreateClientConVar("cleanvoice_box_gaps", 0, true, false, "How much space between the panels")
+
 
 local Height = ScrH()/1.5
 local Width = ScrW()/7
@@ -35,15 +39,23 @@ end
 
 hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 
+	if not Enabled:GetFloat() == 0 then return end --Do nothing if not enabled
+
 	if not Frame then
 
 		Frame = vgui.Create( "DPanel" )
-		Frame:SetPos( ScrW()-Width+1, ScrH()/2-(Height/2) )
+		Frame:SetPos( (ScrW()-Width+1) - RightMargin:GetFloat(), ScrH()/2-(Height/2) )
 		Frame:SetSize(Width, Height)
 		Frame:DockPadding( 0, 0, 0, 0)
 		Frame:SetPaintBackground(false)
 
+		cvars.AddChangeCallback("cleanvoice_margin_right", function(Name, OldVal, NewVal)
+			Frame:SetPos( (ScrW()-Width+1) - NewVal, ScrH()/2-(Height/2) )
+		end)
+
 	end
+
+
 
 	ShouldFade[Ply] = false
 
@@ -57,7 +69,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 	local Panel = vgui.Create("DPanel", Frame)
 	Panel:Dock(BOTTOM)
 	Panel:SetHeight(ScrH()/20)
-	Panel:DockMargin( 0, 0, 0, 0)
+	Panel:DockMargin( 0, BoxMargins:GetFloat(), 0, 0)
 
 	Panel.Paint = function( self, w, h )
 
@@ -69,7 +81,7 @@ hook.Add("PlayerStartVoice", "StartBoxVoicePanels", function(Ply)
 		local Alpha = 255
 
 		if ShouldFade[Ply] and not (Ply:VoiceVolume() > 1) then --Panel sometimes shows colour behind partially faded avatar
-			Alpha = 255 - ((CurTime() - FadeTimestamp[Ply])*FadeRate)
+			Alpha = 255 - ((CurTime() - FadeTimestamp[Ply])*FadeRate:GetFloat())
 		end
 
 		if Alpha < 0 then
